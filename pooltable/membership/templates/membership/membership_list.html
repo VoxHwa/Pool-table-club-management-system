@@ -14,6 +14,73 @@
 <li>没有会员</li>
 {% endfor %}
 -->
+<nav>
+    <ul>
+        <li><a href="{% url 'admin:index' %}">后台管理</a></li>
+        <li><a href="{% url 'membership:add_member' %}">添加会员</a></li>
+        <li><a href="{% url 'membership:index' %}">会员列表</a></li>
+        <li><a href="{% url 'membership:timer' %}">使用计时器</a></li>
+      <!-- 其他导航链接 -->
+    </ul>
+</nav>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('form').submit(function(event) {
+        event.preventDefault(); // prevent the form from submitting normally
+        var form = $(this);
+        var action = form.find('button').data('action');
+        var url = form.attr('action');
+        var data = form.serialize();
+        $.ajax({
+            url: url,
+            data: data,
+            type: 'post',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // display success alert
+                    if (action == 'consume')
+                        alert('消费成功');
+                    if (action == 'deposit')
+                        alert('充值成功');
+                    window.location.reload();
+                    // clear the amount input field
+                    form.find('input[name="amount"]').val('');
+                    
+                    // update the balance or consumption history section
+                    // based on the action
+                    if (action == 'consume') {
+                        // update consumption history section
+                        // with the new entry returned in the response
+                        var entry = response.entry;
+                        var row = $('<tr><td>' + entry.timestamp + '</td><td>' + entry.amount + '</td></tr>');
+                        $('#consumption-history tbody').prepend(row);
+                        
+                        // update the balance section with the new balance
+                        var balance = response.balance;
+                        $('#balance').text(balance);
+                    } else if (action == 'deposit') {
+                        // update the balance section with the new balance
+                        var balance = response.balance;
+                        $('#balance').text(balance);
+                    }
+                } else {
+                    // display error alert
+                    if (action == 'consume')
+                        alert('消费失败'+response.message);
+                    if (action == 'deposit')
+                        alert('充值失败'+response.message);  
+                }
+            },
+            error: function(xhr, errmsg, err) {
+                // display error alert
+                alert('Error');
+            }
+        });
+    });
+});
+</script>
 {% for member in members %}
     <form method="POST" action="{% url 'membership:consume' %}">
         {% csrf_token %}
@@ -31,7 +98,7 @@
 
     
     <tr>
-        <td>{{ member.name }}</td>
+        <a href="{% url 'membership:detail' member.id %}">{{ member.name }}</a>
         <!--<td>{{ member.phone }}</td>-->
         <td>{{ member.balance }}</td>
         <td>
@@ -40,5 +107,5 @@
         </td>
     </tr>
 {% empty %}
-    <li>没有会员</li>
+    <li>没有符合条件的会员</li>
 {% endfor %}

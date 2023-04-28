@@ -4,7 +4,7 @@ from . import views
 app_name = 'membership'
 urlpatterns = [
     path('', views.index, name='index'),
-    path('<int:member_id>/', views.detail, name='detail'),
+    #path('<int:member_id>/', views.detail, name='detail'),
     path('<int:member_id>/recharge/', views.recharge, name='recharge'),
     path('<int:member_id>/start_usage/', views.start_usage, name='start_usage'),
     path('<int:usage_id>/usage/', views.usage, name='usage'),
@@ -21,5 +21,5 @@ urlpatterns = [
     path('deposit/', views.deposit, name='deposit'),
     path('consume/', views.consume, name='consume'),
     path('get_table_status/', views.get_table_status, name='get_table_status'), 
-
+    path('<int:member_id>/', views.member_detail, name='detail'),
 ]

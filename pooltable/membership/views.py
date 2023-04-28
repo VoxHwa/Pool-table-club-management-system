@@ -26,7 +26,18 @@ from django.utils import timezone
 from .models import PoolTable, Member
 from django.http import HttpResponseRedirect
 from django.db.models import Q
+from .models import Member, Consumption
 
+def member_detail(request, member_id):
+    member = Member.objects.get(id=member_id)
+    usage_transactions = Consumption.objects.filter(member=member, type=Consumption.CONSUME).order_by('-timestamp')
+    recharge_transactions = Consumption.objects.filter(member=member, type=Consumption.RECHARGE).order_by('-timestamp')
+    context = {
+        'member': member,
+        'usage_transactions': usage_transactions,
+        'recharge_transactions': recharge_transactions,
+    }
+    return render(request, 'membership/member_detail.html', context)
 def search_member(request):
     search_query = request.GET.get('search', '')
     members = Member.objects.filter(Q(name__icontains=search_query) | Q(phone__icontains=search_query))
@@ -36,9 +47,16 @@ def deposit(request):
     if request.method == 'POST':
         member_id = request.POST.get('member_id')
         amount = Decimal(request.POST.get('amount'))
+        if amount<=0:
+            return JsonResponse({'success': False, 'message': 'Amount must be greater than zero'})
         member = get_object_or_404(Member, id=member_id)
         member.balance += amount
         member.save()
+        consumption = Consumption.objects.create(
+            member=member,
+            amount=Decimal(amount),
+            type=Consumption.RECHARGE,
+        )
         return JsonResponse({'success': True})
 @csrf_exempt
 def consume(request):
@@ -46,11 +64,18 @@ def consume(request):
         member_id = request.POST.get('member_id')
         amount = Decimal(request.POST.get('amount'))
         member = get_object_or_404(Member, id=member_id)
+        if amount<=0:
+            return JsonResponse({'success': False, 'message': 'Amount must be greater than zero'})
         if member.balance < amount:
             return JsonResponse({'success': False, 'message': 'Insufficient balance'})
         else:
             member.balance -= amount
             member.save()
+            consumption = Consumption.objects.create(
+                member=member,
+                amount=Decimal(amount),
+                type=Consumption.CONSUME,
+            )
             return JsonResponse({'success': True})
 def get_table_status(request):
     pool_tables = PoolTable.objects.all()
@@ -195,6 +220,17 @@ def pool_table_stop(request):
 
 def member_detail(request, member_id):
     member = get_object_or_404(Member, pk=member_id)
+    #
+    member = Member.objects.get(id=member_id)
+    usage_transactions = Consumption.objects.filter(member=member, type=Consumption.CONSUME).order_by('-timestamp')
+    recharge_transactions = Consumption.objects.filter(member=member, type=Consumption.RECHARGE).order_by('-timestamp')
+    context = {
+        'member': member,
+        'usage_transactions': usage_transactions,
+        'recharge_transactions': recharge_transactions,
+    }
+    return render(request, 'membership/detail.html', context)
+    #
     transactions = Transaction.objects.filter(member=member)
     usage_transactions = []
     recharge_transactions = []
