@@ -1,0 +1,10 @@
+<ul id="table_status">
+    {% for table in pool_tables %}
+    <li>桌子名：{{ table.name }}，是否可用：{{ table.is_available }}，当前会员：{{ table.current_member }}，开始时间：{{ table.start_time }}，结束时间：{{ table.end_time }}，暂停时间：{{ table.paused_time }}。</li>
+      <p>使用时间：{{ table.get_elapsed_time }}</p>
+      <p>消费金额：{{ table.get_cost }}</p>
+    {% empty %}
+      <li>无桌子数据。</li>
+    {% endfor %}
+  </ul>
+  

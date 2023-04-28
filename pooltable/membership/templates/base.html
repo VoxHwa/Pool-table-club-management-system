@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+  <nav>
+    <ul>
+      
+        <li><a href="{% url 'membership:add_member' %}">添加会员</a></li>
+        <li><a href="{% url 'membership:index' %}">会员列表</a></li>
+        <li><a href="{% url 'membership:timer' %}">使用计时器</a></li>
+      <!-- 其他导航链接 -->
+    </ul>
+  </nav>
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
+  <footer>
+    <!-- 页脚内容 -->
+  </footer>
+</body>
+</html>

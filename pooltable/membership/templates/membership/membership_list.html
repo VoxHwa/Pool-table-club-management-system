@@ -1,0 +1,44 @@
+<!--
+{% for member in members %}
+<li>
+    <a href="{% url 'membership:detail' member.id %}">{{ member.name }}</a> 
+    (余额：{{ member.balance }})
+</li>
+<tr>
+    <td>{{ member.name }}</td>
+    <td>{{ member.phone }}</td>
+    <td>{{ member.balance }}</td>
+    <td><a href="{% url 'membership:edit_member' member.pk %}">编辑</a> | <a href="{% url 'membership:delete_member' member.pk %}">删除</a></td>
+</tr>
+{% empty %}
+<li>没有会员</li>
+{% endfor %}
+-->
+{% for member in members %}
+    <form method="POST" action="{% url 'membership:consume' %}">
+        {% csrf_token %}
+        <input type="hidden" name="member_id" value="{{ member.id }}">
+        <input type="text" name="amount" placeholder="请输入消费金额">
+        <button data-action="consume" type="submit">确认消费</button>
+    </form>
+    <form method="POST" action="{% url 'membership:deposit' %}">
+        {% csrf_token %}
+        <input type="hidden" name="member_id" value="{{ member.id }}">
+        <input type="text" name="amount" placeholder="请输入充值金额">
+        <button data-action="deposit"  type="submit">确认充值</button>
+    </form>
+    
+
+    
+    <tr>
+        <td>{{ member.name }}</td>
+        <!--<td>{{ member.phone }}</td>-->
+        <td>{{ member.balance }}</td>
+        <td>
+            <a href="{% url 'membership:edit_member' member.pk %}">编辑</a> | 
+            <a href="{% url 'membership:delete_member' member.pk %}">删除</a>
+        </td>
+    </tr>
+{% empty %}
+    <li>没有会员</li>
+{% endfor %}

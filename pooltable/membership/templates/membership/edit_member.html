@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑会员信息{% endblock %}
+
+{% block content %}
+  <h2>编辑会员信息</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">保存</button>
+  </form>
+  <p><a href="{% url 'membership:index' %}">返回列表</a></p>
+{% endblock %}

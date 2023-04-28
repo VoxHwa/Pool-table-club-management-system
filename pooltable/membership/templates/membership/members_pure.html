@@ -1,0 +1,14 @@
+{% for member in members %}
+<li>
+    <a href="{% url 'membership:detail' member.id %}">{{ member.name }}</a> 
+    (余额：{{ member.balance }})
+</li>
+<tr>
+    <td>{{ member.name }}</td>
+    <td>{{ member.phone }}</td>
+    <td>{{ member.balance }}</td>
+    <td><a href="{% url 'membership:edit_member' member.pk %}">编辑</a> | <a href="{% url 'membership:delete_member' member.pk %}">删除</a></td>
+</tr>
+{% empty %}
+<li>没有会员</li>
+{% endfor %}

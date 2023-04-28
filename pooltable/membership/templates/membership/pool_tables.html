@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>台球桌计时器</h2>
+  
+  <!-- 表格选择表单 -->
+  <form method="post" id="table-form">
+    {% csrf_token %}
+    <label for="table_id">桌子ID:</label>
+    <select id="table_id" name="table_id" required autocomplete="off">
+      {% for table in pool_tables %}
+        <option value="{{ table.id }}">{{ table.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" name="submit">选择</button>
+  </form>
+  
+  <!-- 会员选择表单 -->
+  <form method="post" id="member-form">
+    {% csrf_token %}
+    <label for="member_id">会员ID（可选）:</label>
+    <select id="member_id" name="member_id" autocomplete="off">
+      {% for member in members %}
+        <option value="{{ member.id }}">{{ member.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" name="submit">选择</button>
+  </form>
+  
+  {% if table %}
+    <h3>桌子状态</h3>
+    <ul>
+      <li>桌子名：{{ table.name }}，是否可用：{{ table.is_available }}，当前会员：{{ table.current_member }}，开始时间：{{ table.start_time }}，结束时间：{{ table.end_time }}，暂停时间：{{ table.paused_time }}，使用时间：{{ table.get_usage_time }}。</li>
+      {% if member %}
+        <li>会员：{{ member.name }}，费率：{{ member.rate_per_hour }}/小时</li>
+        {% if money_to_pay %}
+          <li>消费金额：{{ money_to_pay }}</li>
+        {% endif %}
+      {% endif %}
+      {% if table.is_available %}
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" name="start">开始计时</button>
+        </form>
+      {% else %}
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" name="pause">暂停计时</button>
+          <button type="submit" name="resume">恢复计时</button>
+          <button type="submit" name="stop">停止计时</button>
+          <button type="submit" name="reset">重置计时器</button>
+        </form>
+      {% endif %}
+    </ul>
+  {% else %}
+    <p>请选择一张桌子。</p>
+  {% endif %}
+
+{% endblock %}

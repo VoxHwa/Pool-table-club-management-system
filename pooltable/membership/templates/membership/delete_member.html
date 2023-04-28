@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>删除会员 {{ member }}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-danger">确认删除</button>
+    <a href="{% url 'membership:member_list' %}" class="btn btn-default">取消</a>
+  </form>
+
+{% endblock %}

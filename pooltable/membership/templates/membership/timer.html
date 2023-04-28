@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+  
+{% block content %}
+
+  <h2>台球桌计时器</h2>
+  <form method="post">
+    {% csrf_token %}
+
+
+    <label for="table_id">桌子ID:</label>
+    <select id="table_id" name="table_id" required autocomplete="off">
+        {% for table in pool_tables %}
+          <option value="{{ table.id }}">{{ table.name }}</option>
+        {% endfor %}
+      </select>
+    <br>
+    <button type="submit" name="start" onclick="confirmAction('开始计时！桌号：' + document.getElementById('table_id').value, '您确定要开始计时吗？', 'start', event)">开始计时</button>
+    <button type="submit" name="pause" onclick="confirmAction('暂停计时！桌号：' + document.getElementById('table_id').value, '您确定要暂停计时吗？', 'pause', event)">暂停计时</button>
+    <button type="submit" name="resume" onclick="confirmAction('恢复计时！桌号：' + document.getElementById('table_id').value, '您确定要恢复计时吗？', 'resume', event)">恢复计时</button>
+    <button type="submit" name="stop" onclick="confirmAction('停止计时！桌号：' + document.getElementById('table_id').value, '您确定要停止计时吗？', 'stop', event)">停止计时</button>
+    <button type="submit" name="reset" onclick="confirmAction('重置计时器！桌号：' + document.getElementById('table_id').value, '您确定要重置计时器吗？', 'reset', event)">重置计时器</button>
+    
+    <script>
+    function confirmAction(message, confirmation, action, event) {
+        if (confirm(`您选择了操作${action}，${message}。是否确认执行该操作？`)) {
+            // 如果用户确认执行操作，则不需要中止表单提交
+        } else {
+            // 如果用户取消操作，则需要中止表单提交
+            event.preventDefault();
+        }
+    }
+    </script>
+    
+    
+    
+
+
+  </form>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>function load_table_status() {
+    $.ajax({
+      url: "/membership/get_table_status/",
+      type: "GET",
+      success: function(data) {
+        $("#table_status").html(data);
+      },
+      error: function(xhr, errmsg, err) {
+        console.error("Error: " + xhr.status + ": " + errmsg);
+      },
+    });
+  }
+  
+  // 定期更新桌子状态
+  setInterval(load_table_status, 500); // 每5秒刷新一次
+  </script>
+  <h3>桌子状态</h3>
+  {% include 'membership/table_status_partial.html' %}
+  <!--<ul id="table_status"> 
+    {% for table in pool_tables %}
+    <li>桌子名：{{ table.name }}，是否可用：{{ table.is_available }}，当前会员：{{ table.current_member }}，开始时间：{{ table.start_time }}，结束时间：{{ table.end_time }}，暂停时间：{{ table.paused_time }}。</li>
+      <p >使用时间：{{ table.get_elapsed_time }}</p>
+      <p >消费金额：{{ table.get_cost }}</p>
+    {% empty %}
+      <li>无桌子数据。</li>
+    {% endfor %}
+  </ul>-->  
+
+{% endblock %}
+

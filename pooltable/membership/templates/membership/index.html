@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>会员管理系统</title>
+
+    
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'admin:index' %}">后台管理</a></li>
+            <li><a href="{% url 'membership:add_member' %}">添加会员</a></li>
+            <li><a href="{% url 'membership:index' %}">会员列表</a></li>
+            <li><a href="{% url 'membership:timer' %}">使用计时器</a></li>
+          <!-- 其他导航链接 -->
+        </ul>
+      </nav>
+    <form action="{% url 'membership:search_member' %}" method="get">
+        <label for="search">搜索会员（姓名或手机号）：</label>
+        <input type="text" name="search" required>
+        <button type="submit">搜索</button>
+    </form>
+    <button id="toggle-membership-list">隐藏会员列表</button>
+    <div id="membership-list-wrapper">
+    <h1>会员列表</h1>
+        <ul>
+            {% include 'membership/members_pure.html' %}
+        </ul>
+    <hr>
+    </div>
+
+</body>
+<script>
+    const toggleButton = document.getElementById('toggle-membership-list');
+    const membershipList = document.getElementById('membership-list-wrapper');
+
+    toggleButton.addEventListener('click', function() {
+        if (membershipList.style.display === 'none') {
+            membershipList.style.display = 'block';
+            toggleButton.textContent = '隐藏会员列表';
+        } else {
+            membershipList.style.display = 'none';
+            toggleButton.textContent = '显示会员列表';
+        }
+    });
+</script>
+</html>
